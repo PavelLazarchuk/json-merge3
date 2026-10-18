@@ -1,0 +1,65 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches: [main]
+
+jobs:
+    verify:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: npm
+
+            - run: npm ci
+
+            - name: Format check
+              run: npm run format:check
+
+            - name: Lint
+              run: npm run lint
+
+            - name: Typecheck
+              run: npm run typecheck
+
+            - name: Unit tests with coverage
+              run: npm run test:coverage
+
+            - name: Build
+              run: npm run build
+
+            - name: Bundle size
+              run: npm run size
+
+            - name: Exports sanity (publint + attw)
+              run: npm run check-exports
+
+            - name: Tarball contents review
+              run: npm run pack:verify
+
+    runtimes:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: npm
+
+            - run: npm ci
+
+            - name: Build
+              run: npm run build
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+
+            - name: Smoke-test the built package on the oldest supported Node
+              run: npm run smoke

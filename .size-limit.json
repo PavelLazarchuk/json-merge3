@@ -1,0 +1,21 @@
+[
+    {
+        "name": "json-merge3",
+        "path": "dist/index.js",
+        "limit": "4.7 kB",
+        "gzip": true
+    },
+    {
+        "name": "json-merge3 (cjs)",
+        "path": "dist/index.cjs",
+        "limit": "4.8 kB",
+        "gzip": true
+    },
+    {
+        "name": "tree-shaking: { jsonEqual } only",
+        "path": "dist/index.js",
+        "import": "{ jsonEqual }",
+        "limit": "400 B",
+        "gzip": true
+    }
+]

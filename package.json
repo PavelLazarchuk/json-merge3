@@ -1,0 +1,110 @@
+{
+    "name": "json-merge3",
+    "version": "1.0.0",
+    "description": "Three-way merge for JSON — like git merge, for objects. Merges two edits of the same document against their common base, keeps every non-conflicting change, and reports real conflicts with JSON Pointer paths. Arrays merge by id or as sets, per-path strategies (max, counter, ours/theirs), structural sharing, zero dependencies.",
+    "license": "MIT",
+    "sideEffects": false,
+    "type": "module",
+    "engines": {
+        "node": ">=18"
+    },
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public",
+        "provenance": true
+    },
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            },
+            "require": {
+                "types": "./dist/index.d.cts",
+                "default": "./dist/index.cjs"
+            }
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsup",
+        "dev": "tsup --watch",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint .",
+        "check-exports": "publint && attw --pack .",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "test": "vitest run",
+        "test:coverage": "vitest run --coverage",
+        "test:watch": "vitest",
+        "smoke": "node scripts/smoke.mjs",
+        "size": "size-limit",
+        "pack:verify": "npm pack --dry-run",
+        "changeset": "changeset",
+        "release": "npm run build && node scripts/publish-if-new.mjs",
+        "prepare": "husky"
+    },
+    "keywords": [
+        "three-way-merge",
+        "3-way-merge",
+        "merge3",
+        "diff3",
+        "json",
+        "json-merge",
+        "merge",
+        "conflict",
+        "conflict-resolution",
+        "optimistic-concurrency",
+        "optimistic-locking",
+        "offline-first",
+        "sync",
+        "rebase",
+        "collaborative-editing",
+        "json-pointer",
+        "rfc6901",
+        "keyed-arrays",
+        "structural-sharing",
+        "immutable",
+        "ai-agents",
+        "typescript",
+        "zero-dependencies"
+    ],
+    "author": "Pavel Lazarchuk",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PavelLazarchuk/json-merge3.git"
+    },
+    "bugs": {
+        "url": "https://github.com/PavelLazarchuk/json-merge3/issues"
+    },
+    "homepage": "https://github.com/PavelLazarchuk/json-merge3#readme",
+    "devDependencies": {
+        "@arethetypeswrong/cli": "^0.18.5",
+        "@changesets/cli": "^3.0.3",
+        "@eslint/js": "^10.0.1",
+        "@size-limit/preset-small-lib": "^13.0.3",
+        "@types/node": "^24.13.3",
+        "@vitest/coverage-v8": "^4.1.11",
+        "eslint": "^10.9.1",
+        "eslint-config-prettier": "^10.1.8",
+        "husky": "^9.1.7",
+        "lint-staged": "^17.4.1",
+        "prettier": "^3.9.6",
+        "publint": "^0.3.24",
+        "size-limit": "^13.0.3",
+        "tsup": "^8.5.1",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.68.0",
+        "vitest": "^4.1.11"
+    },
+    "overrides": {
+        "tsup": {
+            "esbuild": "^0.28.2"
+        }
+    }
+}
