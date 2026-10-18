@@ -1,5 +1,8 @@
 # json-merge3
 
+[![npm version](https://img.shields.io/npm/v/json-merge3.svg)](https://www.npmjs.com/package/json-merge3)
+[![npm downloads](https://img.shields.io/npm/dm/json-merge3.svg)](https://www.npmjs.com/package/json-merge3)
+
 Three-way merge for JSON — `git merge`, for objects.
 
 Two people (or a person and an AI agent, or a phone and a server) edit the same
