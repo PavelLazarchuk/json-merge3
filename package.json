@@ -1,6 +1,6 @@
 {
     "name": "json-merge3",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Three-way merge for JSON — like git merge, for objects. Merges two edits of the same document against their common base, keeps every non-conflicting change, and reports real conflicts with JSON Pointer paths. Arrays merge by id or as sets, per-path strategies (max, counter, ours/theirs), structural sharing, zero dependencies.",
     "license": "MIT",
     "sideEffects": false,
