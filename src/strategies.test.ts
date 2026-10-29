@@ -117,6 +117,44 @@ describe('strategies', () => {
         });
     });
 
+    it('counter adds identical changes from both sides', () => {
+        const counter: MergeOptions = { strategies: { '/likes': 'counter' } };
+        const result = loose({ likes: 10 }, { likes: 11 }, { likes: 11 }, counter);
+        expect(result.value).toEqual({ likes: 12 });
+        expect(result.resolved).toMatchObject([
+            { kind: 'value', path: '/likes', resolution: { value: 12 }, by: 'strategy' },
+        ]);
+        expect(loose({}, { likes: 2 }, { likes: 2 }, counter).value).toEqual({ likes: 4 });
+        expect(loose({ likes: 10 }, { likes: 10 }, { likes: 10 }, counter).resolved).toEqual([]);
+        const items = [{ id: 'a', qty: 1, name: 'x' }];
+        const edited = [{ id: 'a', qty: 3, name: 'y' }];
+        expect(
+            loose(
+                { items },
+                { items: edited },
+                { items: edited },
+                {
+                    arrays: { '/items': { by: 'id' } },
+                    strategies: { '/items/*/qty': 'counter' },
+                }
+            ).value
+        ).toEqual({ items: [{ id: 'a', qty: 5, name: 'y' }] });
+        expect(
+            loose(
+                { s: { n: 1 } },
+                { s: { n: 2 } },
+                { s: { n: 2 } },
+                { strategies: { '/**': 'counter' } }
+            ).value
+        ).toEqual({ s: { n: 3 } });
+        expect(loose({ n: 1 }, { n: 2 }, { n: 2 }, { strategies: { '/n': 'max' } })).toEqual({
+            ok: true,
+            value: { n: 2 },
+            conflicts: [],
+            resolved: [],
+        });
+    });
+
     it('leaves conflicts a value strategy cannot handle', () => {
         const kinds = (base: Loose, ours: Loose, theirs: Loose, strategy: Strategy) =>
             loose(base, ours, theirs, { strategies: { '/v': strategy } }).conflicts.map(
@@ -234,6 +272,9 @@ describe('options validation', () => {
         expect(run({ arrays: { '/a': { by: '' } } })).toThrow('options.arrays["/a"]');
         expect(run({ arrays: { '/a': { by: 'id', extra: 1 } } })).toThrow('options.arrays["/a"]');
         expect(run({ strategies: { '/a': 'newest' } })).toThrow('options.strategies["/a"]');
+        expect(run({ arrays: null })).toThrow('options.arrays: expected an object');
+        expect(run({ arrays: ['/a'] })).toThrow('options.arrays: expected an object');
+        expect(run({ strategies: 'max' })).toThrow('options.strategies: expected an object');
     });
 
     it('accepts a root pattern', () => {

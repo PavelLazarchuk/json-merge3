@@ -43,6 +43,7 @@ interface Context {
     readonly arrays: readonly Pattern<ArrayRule>[];
     readonly keyed: boolean;
     readonly strategies: readonly Pattern<Strategy>[];
+    readonly counters: boolean;
     readonly maxDepth: number;
     readonly equal: Equality;
     readonly path: string[];
@@ -77,6 +78,20 @@ function checkStrategy(rule: unknown, pattern: string): Strategy {
     );
 }
 
+function patternsAt<K extends 'arrays' | 'strategies'>(
+    options: MergeOptions,
+    name: K
+): MergeOptions[K] {
+    const record = options[name];
+    if (
+        record !== undefined &&
+        (typeof record !== 'object' || record === null || Array.isArray(record))
+    ) {
+        throw new TypeError(`options.${name}: expected an object of path patterns`);
+    }
+    return record;
+}
+
 function contextFrom(options: MergeOptions): Context {
     if (typeof options !== 'object' || options === null) {
         throw new TypeError('options: expected an object');
@@ -91,13 +106,15 @@ function contextFrom(options: MergeOptions): Context {
     if (!Number.isInteger(maxDepth) || maxDepth < 1) {
         throw new TypeError('options.maxDepth: expected a positive integer');
     }
-    const arrays = compilePatterns(options.arrays, checkArrayRule);
+    const arrays = compilePatterns(patternsAt(options, 'arrays'), checkArrayRule);
+    const strategies = compilePatterns(patternsAt(options, 'strategies'), checkStrategy);
     return {
         options,
         prefer,
         arrays,
         keyed: arrays.some(pattern => typeof pattern.rule === 'object'),
-        strategies: compilePatterns(options.strategies, checkStrategy),
+        strategies,
+        counters: strategies.some(pattern => pattern.rule === 'counter'),
         maxDepth,
         equal: memoizedEqual(),
         path: [],
@@ -325,6 +342,19 @@ function conflictAt(
     return resolution.use === 'ours' ? ours : resolution.use === 'theirs' ? theirs : base;
 }
 
+function mayCount(context: Context, base: Slot, ours: Slot): boolean {
+    if (!context.counters || context.equal(base, ours)) return false;
+    if (typeof ours === 'number') {
+        return lookupInherited(context.strategies, context.path) === 'counter';
+    }
+    if (isPlainObject(ours)) return isPlainObject(base);
+    return (
+        Array.isArray(ours) &&
+        Array.isArray(base) &&
+        typeof lookup(context.arrays, context.path) === 'object'
+    );
+}
+
 function mergeSlot(
     context: Context,
     base: Slot,
@@ -333,7 +363,7 @@ function mergeSlot(
     element?: Element
 ): Slot {
     const { equal } = context;
-    if (equal(ours, theirs)) return ours;
+    if (equal(ours, theirs) && !mayCount(context, base, ours)) return ours;
     if (equal(base, ours)) return theirs;
     if (equal(base, theirs)) return ours;
     if (ours !== MISSING && theirs !== MISSING) {

@@ -179,7 +179,7 @@ merge3(base, ours, theirs, {
 | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `'ours'`, `'theirs'`, `'base'` | Any conflict, by taking that side (which may mean deleting the member).                                                                             |
 | `'max'`, `'min'`               | Two numbers or two strings. ISO 8601 timestamps compare by instant, honouring fractions and offsets. Works when the base was `null` or missing too. |
-| `'counter'`                    | Two numbers: `base + (ours − base) + (theirs − base)`; a missing or non-number base counts as 0.                                                    |
+| `'counter'`                    | Two numbers: `base + (ours − base) + (theirs − base)`; a missing or non-number base counts as 0. Applies even when both sides made the same change. |
 
 Anything a strategy cannot handle — say, `max` on a deletion — goes to
 `resolve`, your own callback:
